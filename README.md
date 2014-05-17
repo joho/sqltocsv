@@ -22,7 +22,7 @@ Dumping a query to a file
 // we're assuming you've setup your sql.DB etc elsewhere
 rows, _ := db.Query("SELECT * FROM users WHERE something=72")
 
-err := sqltocsv.WriteCsvToFile("~/important_user_report.csv", rows)
+err := sqltocsv.WriteFile("~/important_user_report.csv", rows)
 if err != nil {
     panic(err)
 }
@@ -37,7 +37,7 @@ http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-type", "text/csv")
     w.Header().Set("Content-Disposition", "attachment; filename=\"important_user_repost.csv\"")
 
-    sqltocsv.WriteCsvToWriter(w, rows)
+    sqltocsv.Write(w, rows)
 })
 http.ListenAndServe(":8080", nil)
 ```

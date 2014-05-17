@@ -10,22 +10,22 @@ import (
 	"os"
 )
 
-// WriteCsvToFile will write a CSV file to the file name specified (with headers)
+// WriteFile will write a CSV file to the file name specified (with headers)
 // based on whatever is in the sql.Rows you pass in. It calls WriteCsvToWriter under
 // the hood.
-func WriteCsvToFile(csvFileName string, rows *sql.Rows) error {
+func WriteFile(csvFileName string, rows *sql.Rows) error {
 	f, err := os.Create(csvFileName)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	return WriteCsvToWriter(f, rows)
+	return Write(f, rows)
 }
 
-// WriteCsvToFile will write a CSV file to the writer passed in (with headers)
+// Write will write a CSV file to the writer passed in (with headers)
 // based on whatever is in the sql.Rows you pass in.
-func WriteCsvToWriter(writer io.Writer, rows *sql.Rows) error {
+func Write(writer io.Writer, rows *sql.Rows) error {
 	csvWriter := csv.NewWriter(writer)
 
 	columns, err := rows.Columns()

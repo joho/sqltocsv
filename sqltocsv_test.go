@@ -11,7 +11,7 @@ import (
 func TestWriteCsvToFile(t *testing.T) {
 	checkQueryAgainstResult(t, func(rows *sql.Rows) string {
 		testCsvFileName := "/tmp/test.csv"
-		err := WriteCsvToFile(testCsvFileName, rows)
+		err := WriteFile(testCsvFileName, rows)
 		if err != nil {
 			t.Fatalf("error in WriteCsvToFile: %v", err)
 		}
@@ -29,7 +29,7 @@ func TestWriteCsvToWriter(t *testing.T) {
 	checkQueryAgainstResult(t, func(rows *sql.Rows) string {
 		buffer := &bytes.Buffer{}
 
-		err := WriteCsvToWriter(buffer, rows)
+		err := Write(buffer, rows)
 		if err != nil {
 			t.Fatalf("error in WriteCsvToWriter: %v", err)
 		}
