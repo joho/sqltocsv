@@ -1,12 +1,18 @@
+// sqltocsv is a package to make it dead easy to turn arbitrary database query
+// results (in the form of database/sql Rows) into CSV output.
 package sqltocsv
 
 import (
 	"database/sql"
 	"encoding/csv"
 	"fmt"
+	"io"
 	"os"
 )
 
+// WriteCsvToFile will write a CSV file to the file name specified (with headers)
+// based on whatever is in the sql.Rows you pass in. It calls WriteCsvToWriter under
+// the hood.
 func WriteCsvToFile(csvFileName string, rows *sql.Rows) error {
 	f, err := os.Create(csvFileName)
 	if err != nil {
@@ -14,7 +20,13 @@ func WriteCsvToFile(csvFileName string, rows *sql.Rows) error {
 	}
 	defer f.Close()
 
-	csvWriter := csv.NewWriter(f)
+	return WriteCsvToWriter(f, rows)
+}
+
+// WriteCsvToFile will write a CSV file to the writer passed in (with headers)
+// based on whatever is in the sql.Rows you pass in.
+func WriteCsvToWriter(writer io.Writer, rows *sql.Rows) error {
+	csvWriter := csv.NewWriter(writer)
 
 	columns, err := rows.Columns()
 	if err != nil {
