@@ -10,7 +10,7 @@ import (
 	"github.com/joho/sqltocsv"
 )
 
-func TestWriteCsvToFile(t *testing.T) {
+func TestWriteFile(t *testing.T) {
 	checkQueryAgainstResult(t, func(rows *sql.Rows) string {
 		testCsvFileName := "/tmp/test.csv"
 		err := sqltocsv.WriteFile(testCsvFileName, rows)
@@ -27,7 +27,7 @@ func TestWriteCsvToFile(t *testing.T) {
 	})
 }
 
-func TestWriteCsvToWriter(t *testing.T) {
+func TestWrite(t *testing.T) {
 	checkQueryAgainstResult(t, func(rows *sql.Rows) string {
 		buffer := &bytes.Buffer{}
 
