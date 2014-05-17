@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func TestSomething(t *testing.T) {
+func TestSimpleOneRowQuery(t *testing.T) {
 	db := setupDatabase(t)
 
 	rows, err := db.Query("SELECT|people|name,age,bdate|")
