@@ -7,9 +7,18 @@ This is very much a work in progress at this stage.
 ## Usage
 
 ```go
+import (
+    "database/sql"
+    _ "github.com/go-sql-driver/mysql" // or the driver of your choice
+    "github.com/joho/sqltocsv"
+)
+```
+
+```go
+// we're assuming you've setup your sql.DB etc elsewhere
 rows, _ := db.Query("SELECT * FROM users WHERE something=72")
 
-err := WriteCsvToFile("~/important_user_report.csv", rows)
+err := sqltocsv.WriteCsvToFile("~/important_user_report.csv", rows)
 if err != nil {
     panic(err)
 }
