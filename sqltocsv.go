@@ -36,10 +36,11 @@ func WriteCsvToWriter(writer io.Writer, rows *sql.Rows) error {
 	csvWriter.Write(columns)
 
 	count := len(columns)
+	values := make([]interface{}, count)
+	valuePtrs := make([]interface{}, count)
+	row := make([]string, count)
 
 	for rows.Next() {
-		values := make([]interface{}, count)
-		valuePtrs := make([]interface{}, count)
 
 		for i, _ := range columns {
 			valuePtrs[i] = &values[i]
@@ -49,7 +50,6 @@ func WriteCsvToWriter(writer io.Writer, rows *sql.Rows) error {
 			return err
 		}
 
-		row := make([]string, count)
 		for i, _ := range columns {
 			var value interface{}
 			rawValue := values[i]
