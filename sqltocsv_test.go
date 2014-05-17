@@ -1,4 +1,4 @@
-package sqltocsv
+package sqltocsv_test
 
 import (
 	"bytes"
@@ -6,12 +6,14 @@ import (
 	"io/ioutil"
 	"testing"
 	"time"
+
+	"github.com/joho/sqltocsv"
 )
 
 func TestWriteCsvToFile(t *testing.T) {
 	checkQueryAgainstResult(t, func(rows *sql.Rows) string {
 		testCsvFileName := "/tmp/test.csv"
-		err := WriteFile(testCsvFileName, rows)
+		err := sqltocsv.WriteFile(testCsvFileName, rows)
 		if err != nil {
 			t.Fatalf("error in WriteCsvToFile: %v", err)
 		}
@@ -29,7 +31,7 @@ func TestWriteCsvToWriter(t *testing.T) {
 	checkQueryAgainstResult(t, func(rows *sql.Rows) string {
 		buffer := &bytes.Buffer{}
 
-		err := Write(buffer, rows)
+		err := sqltocsv.Write(buffer, rows)
 		if err != nil {
 			t.Fatalf("error in WriteCsvToWriter: %v", err)
 		}
