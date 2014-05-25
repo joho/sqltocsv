@@ -15,13 +15,7 @@ import (
 // based on whatever is in the sql.Rows you pass in. It calls WriteCsvToWriter under
 // the hood.
 func WriteFile(csvFileName string, rows *sql.Rows) error {
-	f, err := os.Create(csvFileName)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	return Write(f, rows)
+	return New(rows).WriteFile(csvFileName)
 }
 
 // WriteString will return a string of the CSV. Don't use this unless you've
@@ -65,6 +59,17 @@ func (c Converter) WriteString() (string, error) {
 	} else {
 		return buffer.String(), nil
 	}
+}
+
+// WriteFile writes teh CSV to the filename specified, return an error if problem
+func (c Converter) WriteFile(csvFileName string) error {
+	f, err := os.Create(csvFileName)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	return c.Write(f)
 }
 
 // Write writes the CSV to the Writer provided
