@@ -2,8 +2,6 @@
 
 A library designed to let you easily turn any arbitrary sql.Rows result from a query into a CSV file with a minimum of fuss.
 
-This is very much a work in progress at this stage.
-
 ## Usage
 
 Importing the package
@@ -69,6 +67,8 @@ csvConverter.SetRowPreProcessor(func (columns []string) (bool, []string) {
 
 csvConverter.WriteFile("~/important_user_report.csv")
 ```
+
+For more details on what else you can do to the `Converter` see the [sqltocsv godocs](http://godoc.org/github.com/joho/sqltocsv)
 
 ## License
 
