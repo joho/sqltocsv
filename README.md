@@ -33,7 +33,7 @@ http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
     rows, _ := db.Query("SELECT * FROM users WHERE something=72")
 
     w.Header().Set("Content-type", "text/csv")
-    w.Header().Set("Content-Disposition", "attachment; filename=\"important_user_repost.csv\"")
+    w.Header().Set("Content-Disposition", "attachment; filename=\"report.csv\"")
 
     sqltocsv.Write(w, rows)
 })
