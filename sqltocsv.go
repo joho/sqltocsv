@@ -87,8 +87,7 @@ func (c Converter) WriteFile(csvFileName string) error {
 		return err
 	}
 
-	err = f.Close()
-	return err
+	return f.Close()
 }
 
 // Write writes the CSV to the Writer provided
