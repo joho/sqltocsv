@@ -80,9 +80,14 @@ func (c Converter) WriteFile(csvFileName string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 
-	return c.Write(f)
+	err = c.Write(f)
+	if err != nil {
+		return err
+	}
+
+	err = f.Close()
+	return err
 }
 
 // Write writes the CSV to the Writer provided
