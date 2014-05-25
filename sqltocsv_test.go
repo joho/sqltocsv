@@ -53,6 +53,21 @@ func TestWriteString(t *testing.T) {
 	})
 }
 
+func TestWriteHeaders(t *testing.T) {
+	rows := getTestRows(t)
+
+	converter := sqltocsv.New(rows)
+
+	converter.WriteHeaders = false
+
+	expectedResult := "Alice,1,1973-11-30 08:33:09 +1100 EST\n"
+	actualResult := converter.String()
+
+	if actualResult != expectedResult {
+		t.Errorf("Expected CSV:\n\n%v\n Got CSV:\n\n%v\n", expectedResult, actualResult)
+	}
+}
+
 func TestSetHeaders(t *testing.T) {
 	rows := getTestRows(t)
 

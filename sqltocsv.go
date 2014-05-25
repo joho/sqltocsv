@@ -34,8 +34,9 @@ func Write(writer io.Writer, rows *sql.Rows) error {
 // There are a few settings you can override if you want to do
 // some fancy stuff to your CSV.
 type Converter struct {
-	rows    *sql.Rows
-	Headers []string
+	rows         *sql.Rows
+	Headers      []string
+	WriteHeaders bool
 }
 
 // String returns the CSV as a string in an fmt package friendly way
@@ -82,15 +83,17 @@ func (c Converter) Write(writer io.Writer) error {
 		return err
 	}
 
-	// use Headers if set, otherwise default to
-	// query Columns
-	var headers []string
-	if len(c.Headers) > 0 {
-		headers = c.Headers
-	} else {
-		headers = columns
+	if c.WriteHeaders {
+		// use Headers if set, otherwise default to
+		// query Columns
+		var headers []string
+		if len(c.Headers) > 0 {
+			headers = c.Headers
+		} else {
+			headers = columns
+		}
+		csvWriter.Write(headers)
 	}
-	csvWriter.Write(headers)
 
 	count := len(columns)
 	values := make([]interface{}, count)
@@ -135,6 +138,7 @@ func (c Converter) Write(writer io.Writer) error {
 // headers or injecting a pre-processing step into your conversion
 func New(rows *sql.Rows) *Converter {
 	return &Converter{
-		rows: rows,
+		rows:         rows,
+		WriteHeaders: true,
 	}
 }
