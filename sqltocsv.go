@@ -43,11 +43,12 @@ type CsvPreProcessorFunc func(row []string) (outputRow bool, processedRow []stri
 // There are a few settings you can override if you want to do
 // some fancy stuff to your CSV.
 type Converter struct {
+	Headers      []string // Column headers to use (default is rows.Columns())
+	WriteHeaders bool     // Flag to output headers in your CSV (default is true)
+	TimeFormat   string   // Format string for any time.Time values (default is time's default)
+
 	rows            *sql.Rows
-	Headers         []string
-	WriteHeaders    bool
 	rowPreProcessor CsvPreProcessorFunc
-	TimeFormat      string
 }
 
 // SetRowPreProcessor lets you specify a CsvPreprocessorFunc for this conversion
