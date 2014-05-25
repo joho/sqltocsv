@@ -49,7 +49,7 @@ rows, _ := db.Query("SELECT * FROM users WHERE something=72")
 
 csvConverter := sqltocsv.New(rows)
 
-csvConverter.DateTimeFormat = time.RFC822
+csvConverter.TimeFormat = time.RFC822
 csvConverter.Headers = append(rows.Columns(), "extra_column_one", "extra_column_two")
 
 csvConverter.SetRowPreProcessor(func (columns []string) (bool, []string) {

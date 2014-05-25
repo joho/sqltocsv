@@ -100,6 +100,18 @@ func TestSetRowPreProcessorOmittingRows(t *testing.T) {
 	assertCsvMatch(t, expected, actual)
 }
 
+func TestSetTimeFormat(t *testing.T) {
+	converter := getConverter(t)
+
+	// Kitchen: 3:04PM
+	converter.TimeFormat = time.Kitchen
+
+	expected := "name,age,bdate\nAlice,1,8:33AM\n"
+	actual := converter.String()
+
+	assertCsvMatch(t, expected, actual)
+}
+
 func checkQueryAgainstResult(t *testing.T, innerTestFunc func(*sql.Rows) string) {
 	rows := getTestRows(t)
 

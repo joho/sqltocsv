@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 )
 
 // WriteFile will write a CSV file to the file name specified (with headers)
@@ -46,6 +47,7 @@ type Converter struct {
 	Headers         []string
 	WriteHeaders    bool
 	rowPreProcessor CsvPreProcessorFunc
+	TimeFormat      string
 }
 
 // SetRowPreProcessor lets you specify a CsvPreprocessorFunc for this conversion
@@ -126,11 +128,15 @@ func (c Converter) Write(writer io.Writer) error {
 			rawValue := values[i]
 
 			byteArray, ok := rawValue.([]byte)
-
 			if ok {
 				value = string(byteArray)
 			} else {
 				value = rawValue
+			}
+
+			timeValue, ok := value.(time.Time)
+			if ok && c.TimeFormat != "" {
+				value = timeValue.Format(c.TimeFormat)
 			}
 
 			row[i] = fmt.Sprintf("%v", value)
