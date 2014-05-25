@@ -53,7 +53,7 @@ type Converter struct {
 }
 
 // String returns the CSV as a string in an fmt package friendly way
-func (c *Converter) String() string {
+func (c Converter) String() string {
 	csv, err := WriteString(c.rows)
 	if err != nil {
 		return ""
@@ -63,7 +63,7 @@ func (c *Converter) String() string {
 }
 
 // Write writes the CSV to the Writer provided
-func (c *Converter) Write(writer io.Writer) error {
+func (c Converter) Write(writer io.Writer) error {
 	rows := c.rows
 	csvWriter := csv.NewWriter(writer)
 
