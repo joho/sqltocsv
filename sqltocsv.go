@@ -1,5 +1,7 @@
 // sqltocsv is a package to make it dead easy to turn arbitrary database query
 // results (in the form of database/sql Rows) into CSV output.
+//
+// Source and README at https://github.com/joho/sqltocsv
 package sqltocsv
 
 import (
