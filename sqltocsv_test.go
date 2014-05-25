@@ -40,7 +40,89 @@ func TestWrite(t *testing.T) {
 	})
 }
 
+func TestWriteString(t *testing.T) {
+	checkQueryAgainstResult(t, func(rows *sql.Rows) string {
+
+		csv, err := sqltocsv.WriteString(rows)
+		if err != nil {
+			t.Fatalf("error in WriteCsvToWriter: %v", err)
+		}
+
+		return csv
+	})
+}
+
+func TestWriteHeaders(t *testing.T) {
+	converter := getConverter(t)
+
+	converter.WriteHeaders = false
+
+	expected := "Alice,1,1973-11-30 08:33:09 +1100 EST\n"
+	actual := converter.String()
+
+	assertCsvMatch(t, expected, actual)
+}
+
+func TestSetHeaders(t *testing.T) {
+	converter := getConverter(t)
+
+	converter.Headers = []string{"Name", "Age", "Birthday"}
+
+	expected := "Name,Age,Birthday\nAlice,1,1973-11-30 08:33:09 +1100 EST\n"
+	actual := converter.String()
+
+	assertCsvMatch(t, expected, actual)
+}
+
+func TestSetRowPreProcessorModifyingRows(t *testing.T) {
+	converter := getConverter(t)
+
+	converter.SetRowPreProcessor(func(columns []string) (bool, []string) {
+		return true, []string{columns[0], "X", "X"}
+	})
+
+	expected := "name,age,bdate\nAlice,X,X\n"
+	actual := converter.String()
+
+	assertCsvMatch(t, expected, actual)
+}
+
+func TestSetRowPreProcessorOmittingRows(t *testing.T) {
+	converter := getConverter(t)
+
+	converter.SetRowPreProcessor(func(columns []string) (bool, []string) {
+		return false, []string{}
+	})
+
+	expected := "name,age,bdate\n"
+	actual := converter.String()
+
+	assertCsvMatch(t, expected, actual)
+}
+
+func TestSetTimeFormat(t *testing.T) {
+	converter := getConverter(t)
+
+	// Kitchen: 3:04PM
+	converter.TimeFormat = time.Kitchen
+
+	expected := "name,age,bdate\nAlice,1,8:33AM\n"
+	actual := converter.String()
+
+	assertCsvMatch(t, expected, actual)
+}
+
 func checkQueryAgainstResult(t *testing.T, innerTestFunc func(*sql.Rows) string) {
+	rows := getTestRows(t)
+
+	expected := "name,age,bdate\nAlice,1,1973-11-30 08:33:09 +1100 EST\n"
+
+	actual := innerTestFunc(rows)
+
+	assertCsvMatch(t, expected, actual)
+}
+
+func getTestRows(t *testing.T) *sql.Rows {
 	db := setupDatabase(t)
 
 	rows, err := db.Query("SELECT|people|name,age,bdate|")
@@ -48,13 +130,11 @@ func checkQueryAgainstResult(t *testing.T, innerTestFunc func(*sql.Rows) string)
 		t.Fatalf("error querying: %v", err)
 	}
 
-	expectedResult := "name,age,bdate\nAlice,1,1973-11-30 08:33:09 +1100 EST\n"
+	return rows
+}
 
-	actualResult := innerTestFunc(rows)
-
-	if actualResult != expectedResult {
-		t.Errorf("Expected CSV:\n\n%v\n Got CSV:\n\n%v\n", expectedResult, actualResult)
-	}
+func getConverter(t *testing.T) *sqltocsv.Converter {
+	return sqltocsv.New(getTestRows(t))
 }
 
 func setupDatabase(t *testing.T) *sql.DB {
@@ -72,5 +152,11 @@ func exec(t testing.TB, db *sql.DB, query string, args ...interface{}) {
 	_, err := db.Exec(query, args...)
 	if err != nil {
 		t.Fatalf("Exec of %q: %v", query, err)
+	}
+}
+
+func assertCsvMatch(t *testing.T, expected string, actual string) {
+	if actual != expected {
+		t.Errorf("Expected CSV:\n\n%v\n Got CSV:\n\n%v\n", expected, actual)
 	}
 }
