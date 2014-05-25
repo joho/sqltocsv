@@ -58,22 +58,15 @@ func (c Converter) String() string {
 	csv, err := c.WriteString()
 	if err != nil {
 		return ""
-	} else {
-		return csv
 	}
+	return csv
 }
 
 // WriteString returns the CSV as a string and an error if something goes wrong
 func (c Converter) WriteString() (string, error) {
-	buffer := &bytes.Buffer{}
-
-	err := c.Write(buffer)
-
-	if err != nil {
-		return "", err
-	} else {
-		return buffer.String(), nil
-	}
+	buffer := bytes.Buffer{}
+	err := c.Write(&buffer)
+	return buffer.String(), err
 }
 
 // WriteFile writes the CSV to the filename specified, return an error if problem
@@ -106,7 +99,11 @@ func (c Converter) Write(writer io.Writer) error {
 		} else {
 			headers = columns
 		}
-		csvWriter.Write(headers)
+		err = csvWriter.Write(headers)
+		if err != nil {
+			// TODO wrap err to say it was an issue with headers?
+			return err
+		}
 	}
 
 	count := len(columns)
@@ -144,7 +141,11 @@ func (c Converter) Write(writer io.Writer) error {
 			writeRow, row = c.rowPreProcessor(row)
 		}
 		if writeRow {
-			csvWriter.Write(row)
+			err = csvWriter.Write(row)
+			if err != nil {
+				// TODO wrap this err to give context as to why it failed?
+				return err
+			}
 		}
 	}
 	err = rows.Err()
