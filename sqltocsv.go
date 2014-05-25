@@ -27,15 +27,7 @@ func WriteFile(csvFileName string, rows *sql.Rows) error {
 // WriteString will return a string of the CSV. Don't use this unless you've
 // got a small data set or a lot of memory
 func WriteString(rows *sql.Rows) (string, error) {
-	buffer := &bytes.Buffer{}
-
-	err := Write(buffer, rows)
-
-	if err != nil {
-		return "", err
-	} else {
-		return buffer.String(), nil
-	}
+	return New(rows).WriteString()
 }
 
 // Write will write a CSV file to the writer passed in (with headers)
@@ -54,11 +46,24 @@ type Converter struct {
 
 // String returns the CSV as a string in an fmt package friendly way
 func (c Converter) String() string {
-	csv, err := WriteString(c.rows)
+	csv, err := c.WriteString()
 	if err != nil {
 		return ""
 	} else {
 		return csv
+	}
+}
+
+// WriteString returns the CSV as a string and an error if something goes wrong
+func (c Converter) WriteString() (string, error) {
+	buffer := &bytes.Buffer{}
+
+	err := c.Write(buffer)
+
+	if err != nil {
+		return "", err
+	} else {
+		return buffer.String(), nil
 	}
 }
 
@@ -75,8 +80,6 @@ func (c Converter) Write(writer io.Writer) error {
 	// use Headers if set, otherwise default to
 	// query Columns
 	var headers []string
-	// TODO remove when I've figured out what's going on
-	fmt.Printf("%v", c.Headers)
 	if len(c.Headers) > 0 {
 		headers = c.Headers
 	} else {
