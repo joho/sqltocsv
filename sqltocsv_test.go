@@ -82,6 +82,40 @@ func TestSetHeaders(t *testing.T) {
 	}
 }
 
+func TestSetRowPreProcessorModifyingRows(t *testing.T) {
+	rows := getTestRows(t)
+
+	converter := sqltocsv.New(rows)
+
+	converter.SetRowPreProcessor(func(columns []string) (bool, []string) {
+		return true, []string{columns[0], "X", "X"}
+	})
+
+	expectedResult := "name,age,bdate\nAlice,X,X\n"
+	actualResult := converter.String()
+
+	if actualResult != expectedResult {
+		t.Errorf("Expected CSV:\n\n%v\n Got CSV:\n\n%v\n", expectedResult, actualResult)
+	}
+}
+
+func TestSetRowPreProcessorOmittingRows(t *testing.T) {
+	rows := getTestRows(t)
+
+	converter := sqltocsv.New(rows)
+
+	converter.SetRowPreProcessor(func(columns []string) (bool, []string) {
+		return false, []string{}
+	})
+
+	expectedResult := "name,age,bdate\n"
+	actualResult := converter.String()
+
+	if actualResult != expectedResult {
+		t.Errorf("Expected CSV:\n\n%v\n Got CSV:\n\n%v\n", expectedResult, actualResult)
+	}
+}
+
 func checkQueryAgainstResult(t *testing.T, innerTestFunc func(*sql.Rows) string) {
 	rows := getTestRows(t)
 

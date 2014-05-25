@@ -30,13 +30,27 @@ func Write(writer io.Writer, rows *sql.Rows) error {
 	return New(rows).Write(writer)
 }
 
+// CsvPreprocessorFunc is a function type for preprocessing your CSV.
+// It takes the columns after they've been munged into strings but
+// before they've been passed into the CSV writer.
+//
+// Return an outputRow of false if you want the row skipped otherwise
+// return the processed Row slice as you want it written to the CSV.
+type CsvPreProcessorFunc func(row []string) (outputRow bool, processedRow []string)
+
 // Converter does the actual work of converting the rows to CSV.
 // There are a few settings you can override if you want to do
 // some fancy stuff to your CSV.
 type Converter struct {
-	rows         *sql.Rows
-	Headers      []string
-	WriteHeaders bool
+	rows            *sql.Rows
+	Headers         []string
+	WriteHeaders    bool
+	rowPreProcessor CsvPreProcessorFunc
+}
+
+// SetRowPreProcessor lets you specify a CsvPreprocessorFunc for this conversion
+func (c *Converter) SetRowPreProcessor(processor CsvPreProcessorFunc) {
+	c.rowPreProcessor = processor
 }
 
 // String returns the CSV as a string in an fmt package friendly way
@@ -62,7 +76,7 @@ func (c Converter) WriteString() (string, error) {
 	}
 }
 
-// WriteFile writes teh CSV to the filename specified, return an error if problem
+// WriteFile writes the CSV to the filename specified, return an error if problem
 func (c Converter) WriteFile(csvFileName string) error {
 	f, err := os.Create(csvFileName)
 	if err != nil {
@@ -124,7 +138,14 @@ func (c Converter) Write(writer io.Writer) error {
 
 			row[i] = fmt.Sprintf("%v", value)
 		}
-		csvWriter.Write(row)
+
+		writeRow := true
+		if c.rowPreProcessor != nil {
+			writeRow, row = c.rowPreProcessor(row)
+		}
+		if writeRow {
+			csvWriter.Write(row)
+		}
 	}
 	err = rows.Err()
 
