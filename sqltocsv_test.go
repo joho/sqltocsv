@@ -3,6 +3,7 @@ package sqltocsv_test
 import (
 	"bytes"
 	"database/sql"
+	"fmt"
 	"io/ioutil"
 	"testing"
 	"time"
@@ -40,13 +41,41 @@ func TestWrite(t *testing.T) {
 	})
 }
 
-func checkQueryAgainstResult(t *testing.T, innerTestFunc func(*sql.Rows) string) {
-	db := setupDatabase(t)
+func TestWriteString(t *testing.T) {
+	checkQueryAgainstResult(t, func(rows *sql.Rows) string {
 
-	rows, err := db.Query("SELECT|people|name,age,bdate|")
-	if err != nil {
-		t.Fatalf("error querying: %v", err)
+		csv, err := sqltocsv.WriteString(rows)
+		if err != nil {
+			t.Fatalf("error in WriteCsvToWriter: %v", err)
+		}
+
+		return csv
+	})
+}
+
+func TestSetHeaders(t *testing.T) {
+	rows := getTestRows(t)
+
+	converter := sqltocsv.New(rows)
+
+	headers := []string{"Name", "Age", "Birthday"}
+	converter.Headers = headers
+
+	if fmt.Sprintf("%v", headers) != fmt.Sprintf("%v", converter.Headers) {
+		t.Error("headers aren't setting correctly")
 	}
+
+	expectedResult := "Name,Age,Birthday\nAlice,1,1973-11-30 08:33:09 +1100 EST\n"
+	actualResult := converter.String()
+	// fmt.Printf("%v", converter.Headers)
+
+	if actualResult != expectedResult {
+		t.Errorf("Expected CSV:\n\n%v\n Got CSV:\n\n%v\n", expectedResult, actualResult)
+	}
+}
+
+func checkQueryAgainstResult(t *testing.T, innerTestFunc func(*sql.Rows) string) {
+	rows := getTestRows(t)
 
 	expectedResult := "name,age,bdate\nAlice,1,1973-11-30 08:33:09 +1100 EST\n"
 
@@ -55,6 +84,17 @@ func checkQueryAgainstResult(t *testing.T, innerTestFunc func(*sql.Rows) string)
 	if actualResult != expectedResult {
 		t.Errorf("Expected CSV:\n\n%v\n Got CSV:\n\n%v\n", expectedResult, actualResult)
 	}
+}
+
+func getTestRows(t *testing.T) *sql.Rows {
+	db := setupDatabase(t)
+
+	rows, err := db.Query("SELECT|people|name,age,bdate|")
+	if err != nil {
+		t.Fatalf("error querying: %v", err)
+	}
+
+	return rows
 }
 
 func setupDatabase(t *testing.T) *sql.DB {
