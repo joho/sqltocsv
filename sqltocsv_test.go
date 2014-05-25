@@ -3,7 +3,6 @@ package sqltocsv_test
 import (
 	"bytes"
 	"database/sql"
-	"fmt"
 	"io/ioutil"
 	"testing"
 	"time"
@@ -73,12 +72,7 @@ func TestSetHeaders(t *testing.T) {
 
 	converter := sqltocsv.New(rows)
 
-	headers := []string{"Name", "Age", "Birthday"}
-	converter.Headers = headers
-
-	if fmt.Sprintf("%v", headers) != fmt.Sprintf("%v", converter.Headers) {
-		t.Error("headers aren't setting correctly")
-	}
+	converter.Headers = []string{"Name", "Age", "Birthday"}
 
 	expectedResult := "Name,Age,Birthday\nAlice,1,1973-11-30 08:33:09 +1100 EST\n"
 	actualResult := converter.String()
