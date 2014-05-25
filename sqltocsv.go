@@ -83,6 +83,7 @@ func (c Converter) WriteFile(csvFileName string) error {
 
 	err = c.Write(f)
 	if err != nil {
+		f.Close() // close, but only return/handle the write error
 		return err
 	}
 
