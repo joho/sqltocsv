@@ -62,7 +62,7 @@ csvConverter.SetRowPreProcessor(func (columns []string) (bool, []string) {
     extra_column_one = generateSomethingHypotheticalFromColumn(columns[2])
     extra_column_two = lookupSomeApiThingForColumn(columns[4])
 
-    return append(columns, extra_column_one, lookupSomeApiThingForColumn)
+    return append(columns, extra_column_one, extra_column_two)
 })
 
 csvConverter.WriteFile("~/important_user_report.csv")
