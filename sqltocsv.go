@@ -39,7 +39,7 @@ func Write(writer io.Writer, rows *sql.Rows) error {
 //
 // Return an outputRow of false if you want the row skipped otherwise
 // return the processed Row slice as you want it written to the CSV.
-type CsvPreProcessorFunc func(row []string) (outputRow bool, processedRow []string)
+type CsvPreProcessorFunc func(row []string, columns []string) (outputRow bool, processedRow []string)
 
 // Converter does the actual work of converting the rows to CSV.
 // There are a few settings you can override if you want to do
@@ -152,7 +152,7 @@ func (c Converter) Write(writer io.Writer) error {
 
 		writeRow := true
 		if c.rowPreProcessor != nil {
-			writeRow, row = c.rowPreProcessor(row)
+			writeRow, row = c.rowPreProcessor(row, columns)
 		}
 		if writeRow {
 			err = csvWriter.Write(row)
