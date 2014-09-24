@@ -77,8 +77,8 @@ func TestSetHeaders(t *testing.T) {
 func TestSetRowPreProcessorModifyingRows(t *testing.T) {
 	converter := getConverter(t)
 
-	converter.SetRowPreProcessor(func(columns []string) (bool, []string) {
-		return true, []string{columns[0], "X", "X"}
+	converter.SetRowPreProcessor(func(rows []string, columnNames []string) (bool, []string) {
+		return true, []string{rows[0], "X", "X"}
 	})
 
 	expected := "name,age,bdate\nAlice,X,X\n"
@@ -90,7 +90,7 @@ func TestSetRowPreProcessorModifyingRows(t *testing.T) {
 func TestSetRowPreProcessorOmittingRows(t *testing.T) {
 	converter := getConverter(t)
 
-	converter.SetRowPreProcessor(func(columns []string) (bool, []string) {
+	converter.SetRowPreProcessor(func(rows []string, columnNames []string) (bool, []string) {
 		return false, []string{}
 	})
 
