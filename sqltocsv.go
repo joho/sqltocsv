@@ -39,7 +39,7 @@ func Write(writer io.Writer, rows *sql.Rows) error {
 //
 // Return an outputRow of false if you want the row skipped otherwise
 // return the processed Row slice as you want it written to the CSV.
-type CsvPreProcessorFunc func(row []string, columns []string) (outputRow bool, processedRow []string)
+type CsvPreProcessorFunc func(row []string, columnNames []string) (outputRow bool, processedRow []string)
 
 // Converter does the actual work of converting the rows to CSV.
 // There are a few settings you can override if you want to do
@@ -95,7 +95,7 @@ func (c Converter) Write(writer io.Writer) error {
 	rows := c.rows
 	csvWriter := csv.NewWriter(writer)
 
-	columns, err := rows.Columns()
+	columnNames, err := rows.Columns()
 	if err != nil {
 		return err
 	}
@@ -107,7 +107,7 @@ func (c Converter) Write(writer io.Writer) error {
 		if len(c.Headers) > 0 {
 			headers = c.Headers
 		} else {
-			headers = columns
+			headers = columnNames
 		}
 		err = csvWriter.Write(headers)
 		if err != nil {
@@ -116,14 +116,14 @@ func (c Converter) Write(writer io.Writer) error {
 		}
 	}
 
-	count := len(columns)
+	count := len(columnNames)
 	values := make([]interface{}, count)
 	valuePtrs := make([]interface{}, count)
 	row := make([]string, count)
 
 	for rows.Next() {
 
-		for i, _ := range columns {
+		for i, _ := range columnNames {
 			valuePtrs[i] = &values[i]
 		}
 
@@ -131,7 +131,7 @@ func (c Converter) Write(writer io.Writer) error {
 			return err
 		}
 
-		for i, _ := range columns {
+		for i, _ := range columnNames {
 			var value interface{}
 			rawValue := values[i]
 
@@ -152,7 +152,7 @@ func (c Converter) Write(writer io.Writer) error {
 
 		writeRow := true
 		if c.rowPreProcessor != nil {
-			writeRow, row = c.rowPreProcessor(row, columns)
+			writeRow, row = c.rowPreProcessor(row, columnNames)
 		}
 		if writeRow {
 			err = csvWriter.Write(row)
