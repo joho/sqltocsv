@@ -112,6 +112,15 @@ func TestSetTimeFormat(t *testing.T) {
 	assertCsvMatch(t, expected, actual)
 }
 
+func TestConvertingNilValueShouldReturnEmptyString(t *testing.T) {
+	converter := sqltocsv.New(getTestRowsByQuery(t, "SELECT|people|name,nickname,age|"))
+
+	expected := "name,nickname,age\nAlice,\"\",1\n"
+	actual := converter.String()
+
+	assertCsvMatch(t, expected, actual)
+}
+
 func checkQueryAgainstResult(t *testing.T, innerTestFunc func(*sql.Rows) string) {
 	rows := getTestRows(t)
 
@@ -123,9 +132,13 @@ func checkQueryAgainstResult(t *testing.T, innerTestFunc func(*sql.Rows) string)
 }
 
 func getTestRows(t *testing.T) *sql.Rows {
+	return getTestRowsByQuery(t, "SELECT|people|name,age,bdate|")
+}
+
+func getTestRowsByQuery(t *testing.T, query string) *sql.Rows {
 	db := setupDatabase(t)
 
-	rows, err := db.Query("SELECT|people|name,age,bdate|")
+	rows, err := db.Query(query)
 	if err != nil {
 		t.Fatalf("error querying: %v", err)
 	}
@@ -143,8 +156,8 @@ func setupDatabase(t *testing.T) *sql.DB {
 		t.Fatalf("Error opening testdb %v", err)
 	}
 	exec(t, db, "WIPE")
-	exec(t, db, "CREATE|people|name=string,age=int32,bdate=datetime")
-	exec(t, db, "INSERT|people|name=Alice,age=?,bdate=?", 1, time.Unix(123456789, 0))
+	exec(t, db, "CREATE|people|name=string,age=int32,bdate=datetime,nickname=nullstring")
+	exec(t, db, "INSERT|people|name=Alice,age=?,bdate=?,nickname=?", 1, time.Unix(123456789, 0), nil)
 	return db
 }
 

@@ -147,7 +147,11 @@ func (c Converter) Write(writer io.Writer) error {
 				value = timeValue.Format(c.TimeFormat)
 			}
 
-			row[i] = fmt.Sprintf("%v", value)
+			if value == nil {
+				row[i] = ""
+			} else {
+				row[i] = fmt.Sprintf("%v", value)
+			}
 		}
 
 		writeRow := true
