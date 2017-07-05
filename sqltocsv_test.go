@@ -115,7 +115,7 @@ func TestSetTimeFormat(t *testing.T) {
 func TestConvertingNilValueShouldReturnEmptyString(t *testing.T) {
 	converter := sqltocsv.New(getTestRowsByQuery(t, "SELECT|people|name,nickname,age|"))
 
-	expected := "name,nickname,age\nAlice,\"\",1\n"
+	expected := "name,nickname,age\nAlice,,1\n"
 	actual := converter.String()
 
 	assertCsvMatch(t, expected, actual)
