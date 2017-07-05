@@ -1,4 +1,4 @@
-# sqltocsv
+# sqltocsv [![Build Status](https://travis-ci.org/joho/sqltocsv.svg?branch=master)](https://travis-ci.org/joho/sqltocsv)
 
 A library designed to let you easily turn any arbitrary sql.Rows result from a query into a CSV file with a minimum of fuss.
 
