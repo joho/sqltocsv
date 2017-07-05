@@ -4,11 +4,16 @@ import (
 	"bytes"
 	"database/sql"
 	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
 	"github.com/joho/sqltocsv"
 )
+
+func init() {
+	os.Setenv("TZ", "UTC")
+}
 
 func TestWriteFile(t *testing.T) {
 	checkQueryAgainstResult(t, func(rows *sql.Rows) string {
@@ -57,7 +62,7 @@ func TestWriteHeaders(t *testing.T) {
 
 	converter.WriteHeaders = false
 
-	expected := "Alice,1,1973-11-30 08:33:09 +1100 EST\n"
+	expected := "Alice,1,1973-11-29 21:33:09 +0000 UTC\n"
 	actual := converter.String()
 
 	assertCsvMatch(t, expected, actual)
@@ -68,7 +73,7 @@ func TestSetHeaders(t *testing.T) {
 
 	converter.Headers = []string{"Name", "Age", "Birthday"}
 
-	expected := "Name,Age,Birthday\nAlice,1,1973-11-30 08:33:09 +1100 EST\n"
+	expected := "Name,Age,Birthday\nAlice,1,1973-11-29 21:33:09 +0000 UTC\n"
 	actual := converter.String()
 
 	assertCsvMatch(t, expected, actual)
@@ -106,7 +111,7 @@ func TestSetTimeFormat(t *testing.T) {
 	// Kitchen: 3:04PM
 	converter.TimeFormat = time.Kitchen
 
-	expected := "name,age,bdate\nAlice,1,8:33AM\n"
+	expected := "name,age,bdate\nAlice,1,9:33PM\n"
 	actual := converter.String()
 
 	assertCsvMatch(t, expected, actual)
@@ -124,7 +129,7 @@ func TestConvertingNilValueShouldReturnEmptyString(t *testing.T) {
 func checkQueryAgainstResult(t *testing.T, innerTestFunc func(*sql.Rows) string) {
 	rows := getTestRows(t)
 
-	expected := "name,age,bdate\nAlice,1,1973-11-30 08:33:09 +1100 EST\n"
+	expected := "name,age,bdate\nAlice,1,1973-11-29 21:33:09 +0000 UTC\n"
 
 	actual := innerTestFunc(rows)
 
