@@ -119,9 +119,9 @@ func (c Converter) Write(writer io.Writer) error {
 	count := len(columnNames)
 	values := make([]interface{}, count)
 	valuePtrs := make([]interface{}, count)
-	row := make([]string, count)
 
 	for rows.Next() {
+		row := make([]string, count)
 
 		for i, _ := range columnNames {
 			valuePtrs[i] = &values[i]
