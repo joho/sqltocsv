@@ -72,4 +72,4 @@ For more details on what else you can do to the `Converter` see the [sqltocsv go
 
 ## License
 
-&copy; [John Barton](http://whoisjohnbarton.com/) but under MIT (see [LICENSE](LICENSE)) except for fakedb_test.go which I lifted from the Go standard library and is under BSD and I am unsure what that means legally.
+&copy; [John Barton](https://johnbarton.co/) but under MIT (see [LICENSE](LICENSE)) except for fakedb_test.go which I lifted from the Go standard library and is under BSD and I am unsure what that means legally.
