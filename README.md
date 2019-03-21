@@ -1,6 +1,6 @@
 # sqltocsv [![Build Status](https://travis-ci.org/joho/sqltocsv.svg?branch=master)](https://travis-ci.org/joho/sqltocsv)
 
-A library designed to let you easily turn any arbitrary sql.Rows result from a query into a CSV file with a minimum of fuss.
+A library designed to let you easily turn any arbitrary sql.Rows result from a query into a CSV file with a minimum of fuss. Remember to handle your errors and close your rows (not demonstrated in every example).
 
 ## Usage
 
@@ -30,7 +30,12 @@ Return a query as a CSV download on the world wide web
 
 ```go
 http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-    rows, _ := db.Query("SELECT * FROM users WHERE something=72")
+    rows, err := db.Query("SELECT * FROM users WHERE something=72")
+    if err != nil {
+        http.Error(w, err, http.StatusInternalServerError)
+        return
+    }
+    defer rows.Close()
 
     w.Header().Set("Content-type", "text/csv")
     w.Header().Set("Content-Disposition", "attachment; filename=\"report.csv\"")
