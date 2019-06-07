@@ -94,6 +94,7 @@ func (c Converter) WriteFile(csvFileName string) error {
 func (c Converter) Write(writer io.Writer) error {
 	rows := c.rows
 	csvWriter := csv.NewWriter(writer)
+	csvWriter.Comma = ';'
 
 	columnNames, err := rows.Columns()
 	if err != nil {
