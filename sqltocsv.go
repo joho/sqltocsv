@@ -48,6 +48,7 @@ type Converter struct {
 	Headers      []string // Column headers to use (default is rows.Columns())
 	WriteHeaders bool     // Flag to output headers in your CSV (default is true)
 	TimeFormat   string   // Format string for any time.Time values (default is time's default)
+	Delimiter    rune     // Delimiter to use in your CSV (default is comma)
 
 	rows            *sql.Rows
 	rowPreProcessor CsvPreProcessorFunc
@@ -94,6 +95,9 @@ func (c Converter) WriteFile(csvFileName string) error {
 func (c Converter) Write(writer io.Writer) error {
 	rows := c.rows
 	csvWriter := csv.NewWriter(writer)
+	if c.Delimiter != '\x00' {
+		csvWriter.Comma = c.Delimiter
+	}
 
 	columnNames, err := rows.Columns()
 	if err != nil {
@@ -180,5 +184,6 @@ func New(rows *sql.Rows) *Converter {
 	return &Converter{
 		rows:         rows,
 		WriteHeaders: true,
+		Delimiter:    ',',
 	}
 }

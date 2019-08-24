@@ -126,6 +126,29 @@ func TestConvertingNilValueShouldReturnEmptyString(t *testing.T) {
 	assertCsvMatch(t, expected, actual)
 }
 
+func TestAlternateDelimiter(t *testing.T) {
+	converter := getConverter(t)
+
+	converter.Delimiter = '|'
+
+	expected := "name|age|bdate\nAlice|1|1973-11-29 21:33:09 +0000 UTC\n"
+	actual := converter.String()
+
+	assertCsvMatch(t, expected, actual)
+}
+
+func TestMissingDelimiter(t *testing.T) {
+	converter := getConverter(t)
+
+	var delimiter rune
+	converter.Delimiter = delimiter
+
+	expected := "name,age,bdate\nAlice,1,1973-11-29 21:33:09 +0000 UTC\n"
+	actual := converter.String()
+
+	assertCsvMatch(t, expected, actual)
+}
+
 func checkQueryAgainstResult(t *testing.T, innerTestFunc func(*sql.Rows) string) {
 	rows := getTestRows(t)
 
