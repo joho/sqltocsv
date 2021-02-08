@@ -115,8 +115,7 @@ func (c Converter) Write(writer io.Writer) error {
 		}
 		err = csvWriter.Write(headers)
 		if err != nil {
-			// TODO wrap err to say it was an issue with headers?
-			return err
+			return fmt.Errorf("failed to write headers: %w", err)
 		}
 	}
 
@@ -165,8 +164,7 @@ func (c Converter) Write(writer io.Writer) error {
 		if writeRow {
 			err = csvWriter.Write(row)
 			if err != nil {
-				// TODO wrap this err to give context as to why it failed?
-				return err
+				return fmt.Errorf("failed to write data row to csv %w", err)
 			}
 		}
 	}
