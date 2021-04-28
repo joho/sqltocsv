@@ -48,6 +48,7 @@ type Converter struct {
 	Headers      []string // Column headers to use (default is rows.Columns())
 	WriteHeaders bool     // Flag to output headers in your CSV (default is true)
 	TimeFormat   string   // Format string for any time.Time values (default is time's default)
+	FloatFormat  string   // Format string for any float64 and float32 values (default is %v)
 	Delimiter    rune     // Delimiter to use in your CSV (default is comma)
 
 	rows            *sql.Rows
@@ -143,6 +144,16 @@ func (c Converter) Write(writer io.Writer) error {
 				value = string(byteArray)
 			} else {
 				value = rawValue
+			}
+
+			float64Value, ok := value.(float64)
+			if ok && c.FloatFormat != "" {
+				value = fmt.Sprintf(c.FloatFormat, float64Value)
+			} else {
+				float32Value, ok := value.(float32)
+				if ok && c.FloatFormat != "" {
+					value = fmt.Sprintf(c.FloatFormat, float32Value)
+				}
 			}
 
 			timeValue, ok := value.(time.Time)
