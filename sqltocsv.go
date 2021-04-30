@@ -79,6 +79,8 @@ func (c Converter) WriteString() (string, error) {
 // WriteFile writes the CSV to the filename specified, return an error if problem
 func (c Converter) WriteFile(csvFileName string) error {
 	f, err := os.Create(csvFileName)
+	bomUtf8 := []byte{0xEF, 0xBB, 0xBF}
+        f.Write(bomUtf8)
 	if err != nil {
 		return err
 	}
